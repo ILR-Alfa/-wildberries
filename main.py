@@ -1,23 +1,14 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-from openpyxl import load_workbook, Workbook
+import datetime
+import requests
+import json
+import pandas as pd
+from retry import retry
 
 
-url = "https://vkusnoitochka.ru/menu"
-firefox_options = FirefoxOptions()
-firefox_options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
-firefox_options.set_preference("permissions.default.geo", 2) 
-firefox_options.set_preference("geo.enabled", False)
-firefox_options.add_argument("--headless")
 
 
-service = FirefoxService(r"D:\projects\Parser wildberis\driver\geckodriver.exe")
+def get_catalogs() -> dict:
+    url =  'https://static-basket-01.wbbasket.ru/vol0/data/main-menu-ru-ru-v3.json'
+    headers = {'Accept': '*/*', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    return requests.get(url, headers=headers).json()
 
-
-driver = webdriver.Firefox(service=service, options=firefox_options)
-wait = WebDriverWait(driver, 10)
