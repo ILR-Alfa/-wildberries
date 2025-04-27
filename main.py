@@ -34,4 +34,15 @@ def get_data_category(catalogs_wb: dict) -> list:
         for child in catalogs_wb:
             catalog_data.extend(get_data_category(child))
     return catalog_data
+
+
+def search_category_in_catalog(url: str, catalog_list: list) -> dict:
+    for catalog in catalog_list:
+        if catalog["url"] == url.split('https://www.wildberries.ru')[-1]:
+            print(f'найдено совпадение: {catalog["name"]}')
+            return catalog
+        
+
+
+
     
