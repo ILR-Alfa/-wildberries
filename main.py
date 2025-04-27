@@ -5,8 +5,6 @@ import pandas as pd
 from retry import retry
 
 
-
-
 def get_catalogs_wb() -> dict:
     url =  'https://static-basket-01.wbbasket.ru/vol0/data/main-menu-ru-ru-v3.json'
     headers = {'Accept': '*/*', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -96,8 +94,6 @@ def scrap_page(page: int, shard: str, query: str, low_price: int, top_price: int
     return r.json()
 
 
-
-
 def save_excel(data: list, filename: str):
     """сохранение результата в excel файл"""
     df = pd.DataFrame(data)
@@ -147,3 +143,34 @@ def parser(url: str, low_price: int = 1, top_price: int = 1000000, discount: int
         print('Ошибка! Возможно не верно указан раздел. Удалите все доп фильтры с ссылки')
     except PermissionError:
         print('Ошибка! Вы забыли закрыть созданный ранее excel файл. Закройте и повторите попытку')
+
+
+
+if __name__ == '__main__':
+    # url = 'https://www.wildberries.ru/catalog/sport/vidy-sporta/velosport/velosipedy'
+
+
+    # url = 'https://www.wildberries.ru/catalog/elektronika/planshety'
+    # low_price = 10000
+    # top_price = 15000
+    # discount = 0  
+    # start = datetime.datetime.now()  
+    #
+    # parser(url=url, low_price=low_price, top_price=top_price, discount=discount)
+    #
+    # end = datetime.datetime.now()  
+    # total = end - start  
+    # print("Затраченное время:" + str(total))
+    
+    while True:
+        try:
+            url = input('Введите ссылку на категорию без фильтров для сбора(или "q" для выхода):\n')
+            if url == 'q':
+                break
+            low_price = int(input('Введите минимальную сумму товара: '))
+            top_price = int(input('Введите максимульную сумму товара: '))
+            discount = int(input('Введите минимальную скидку(введите 0 если без скидки): '))
+            parser(url=url, low_price=low_price, top_price=top_price, discount=discount)
+        except:
+            print('произошла ошибка данных при вводе, проверте правильность введенных данных,\n'
+                  'Перезапуск...')
