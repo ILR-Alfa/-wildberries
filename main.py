@@ -43,6 +43,42 @@ def search_category_in_catalog(url: str, catalog_list: list) -> dict:
             return catalog
         
 
-
+def get_data_from_json(json_file: dict) -> list:
+    """извлекаем из json данные"""
+    data_list = []
+    for data in json_file['data']['products']:
+        sku = data.get('id')
+        name = data.get('name')
+        price = int(data.get("priceU") / 100)
+        salePriceU = int(data.get('salePriceU') / 100)
+        cashback = data.get('feedbackPoints')
+        sale = data.get('sale')
+        brand = data.get('brand')
+        rating = data.get('rating')
+        supplier = data.get('supplier')
+        supplierRating = data.get('supplierRating')
+        feedbacks = data.get('feedbacks')
+        reviewRating = data.get('reviewRating')
+        promoTextCard = data.get('promoTextCard')
+        promoTextCat = data.get('promoTextCat')
+        data_list.append({
+            'id': sku,
+            'name': name,
+            'price': price,
+            'salePriceU': salePriceU,
+            'cashback': cashback,
+            'sale': sale,
+            'brand': brand,
+            'rating': rating,
+            'supplier': supplier,
+            'supplierRating': supplierRating,
+            'feedbacks': feedbacks,
+            'reviewRating': reviewRating,
+            'promoTextCard': promoTextCard,
+            'promoTextCat': promoTextCat,
+            'link': f'https://www.wildberries.ru/catalog/{data.get("id")}/detail.aspx?targetUrl=BP'
+        })
+        # print(f"SKU:{data['id']} Цена: {int(data['salePriceU'] / 100)} Название: {data['name']} Рейтинг: {data['rating']}")
+    return data_list
 
     
