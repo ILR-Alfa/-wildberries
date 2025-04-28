@@ -78,7 +78,7 @@ def get_data_from_json(json_file: dict) -> list:
     return data_list
 
     
-@retry(Exception, tries=-1, delay=0)
+@retry(Exception, tries=-1, delay=1)
 def scrap_page(page: int, shard: str, query: str, low_price: int, top_price: int, discount: int = None) -> dict:
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0)"}
     url = f'https://catalog.wb.ru/catalog/{shard}/catalog?appType=1&curr=rub' \
@@ -89,9 +89,20 @@ def scrap_page(page: int, shard: str, query: str, low_price: int, top_price: int
           f'&sort=popular&spp=0' \
           f'&{query}' \
           f'&discount={discount}'
-    r = requests.get(url, headers=headers)
-    print(f'Статус: {r.status_code} Страница {page} Идет сбор...')
-    return r.json()
+    
+    print(f"Запрос: {url}")  
+    
+    if not shard or not query:
+        raise ValueError("Shard или Query не определены!")
+    
+    try:
+        r = requests.get(url, headers=headers)
+        print(f'Статус: {r.status_code} Страница {page}')
+        r.raise_for_status()  
+        return r.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при запросе: {e}")
+        raise
 
 
 def save_excel(data: list, filename: str):
