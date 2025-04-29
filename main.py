@@ -2,6 +2,8 @@ import datetime
 import requests
 import json
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+import time
 from retry import retry
 
 
@@ -91,6 +93,7 @@ def scrap_page(page: int, shard: str, query: str, low_price: int, top_price: int
           f'&discount={discount}'
     
     print(f"Запрос: {url}")  
+    time.sleep(0.5)
     
     if not shard or not query:
         raise ValueError("Shard или Query не определены!")
@@ -134,19 +137,27 @@ def parser(url: str, low_price: int = 1, top_price: int = 1000000, discount: int
     try:
         category = search_category_in_catalog(url=url, catalog_list=catalog_data)
         data_list = []
-        for page in range(1, 51):
-            data = scrap_page(
-                page=page,
-                shard=category['shard'],
-                query=category['query'],
-                low_price=low_price,
-                top_price=top_price,
-                discount=discount)
-            print(f'Добавлено позиций: {len(get_data_from_json(data))}')
-            if len(get_data_from_json(data)) > 0:
-                data_list.extend(get_data_from_json(data))
-            else:
-                break
+
+        max_pages = 50
+        pages = range(1, max_pages + 1)
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [
+                executor.submit(scrap_page, page, category['shard'], category['query'], low_price, top_price, discount)
+                for page in pages
+            ]
+            for future in futures:
+                try:
+                    data = future.result()
+                    if data and data['data']['products']:
+                        data_list.extend(get_data_from_json(data))
+                        print(f'Добавлено позиций: {len(get_data_from_json(data))}')
+                    else:
+                        break
+                except Exception as e:
+                    print(f"Ошибка при обработке страницы: {e}")
+                time.sleep(0.5)
+
         print(f'Сбор данных завершен. Собрано: {len(data_list)} товаров.')
         save_excel(data_list, f'{category["name"]}_from_{low_price}_to_{top_price}')
         print(f'Ссылка для проверки: {url}?priceU={low_price * 100};{top_price * 100}&discount={discount}')
