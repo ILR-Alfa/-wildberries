@@ -16,7 +16,7 @@ def get_data_category(catalogs_wb: dict) -> list:
     if isinstance(catalogs_wb, dict) and "childs" not in catalogs_wb:
         catalog_data.append({
             'name': f"{catalogs_wb['name']}",
-            'shard': catalogs_wb.get('shards', None),
+            'shard': catalogs_wb.get('shard', None),
             'url': catalogs_wb['url'],
             'query': catalogs_wb.get('query', None)
         })
