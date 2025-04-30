@@ -31,4 +31,4 @@
 
 1. Установите необходимые зависимости:
    
-   pip install pandas openpyxl xlsxwriter retry
+   pip install -r requirements.txt
